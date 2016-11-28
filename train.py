@@ -2,7 +2,7 @@ import tensorflow as tf
 
 from load_data import X_train, y_train
 
-# Figure out dimensions of things
+# Dimensions
 num_classes = len(y_train[0])
 num_features = len(X_train[0][0])
 num_timesteps = len(X_train[0])
@@ -33,9 +33,9 @@ _outputs, _ = tf.nn.rnn(
 predictions = tf.matmul(_outputs[-1], output_weights) + output_biases
 
 # Express loss of the model in terms of predictions and input y values, and implicitly express updating trainable variables by minimizing loss
-_loss         = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(predictions, y)) \
-                + LAMBDA_LOSS_AMOUNT * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables())
-minimize_loss = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(_loss)
+_loss          = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(predictions, y)) \
+                 + LAMBDA_LOSS_AMOUNT * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables())
+minimized_loss = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(_loss)
 
 # Express accuracy in terms of predictions and input y values, and remember expression by name, so it can be used during testing
 accuracy      = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(predictions, 1), tf.argmax(y, 1)), dtype=tf.float32), name='accuracy')
@@ -56,7 +56,7 @@ with tf.Session() as training_session:
     # Run the computation graph on the training data, passing it in in batches, and repeating the whole thing NUM_TRAINING_REPETITIONS times
     for _ in range(NUM_TRAINING_REPETITIONS):
         for start, end in zip(range(0, len(X_train), BATCH_SIZE), range(BATCH_SIZE, len(X_train) + 1, BATCH_SIZE)):
-            training_session.run(minimize_loss, feed_dict={'X:0': X_train[start:end], 'y:0': y_train[start:end]})
+            training_session.run(minimized_loss, feed_dict={'X:0': X_train[start:end], 'y:0': y_train[start:end]})
 
     # Save
     from save_location import SAVE_LOCATION

@@ -1,4 +1,3 @@
-# DUMMY DATA
 def load_data(path_to_data=None, create_dummy_data=False):
     if not create_dummy_data:
         raise NotImplementedError
@@ -9,7 +8,7 @@ def load_dummy_data():
     import random
     from random import shuffle
 
-    # MAKE IT DETERMINISTIC TO PROVE TF SAVE/RESTORE WORKS
+    # Make it determinstic to prove save/restore works
     from random_seed import RANDOM_SEED
     random.seed(RANDOM_SEED)
 

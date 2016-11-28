@@ -6,5 +6,5 @@ with tf.Session() as testing_session:
     new_saver.restore(testing_session, SAVE_LOCATION)
 
     from load_data import X_test, y_test
-    accuracy_out = testing_session.run(tf.get_collection('accuracy')[0], feed_dict={'X:0': X_test, 'y:0': y_test})
-    print('final test accuracy: {}'.format(accuracy_out))
+    test_accuracy = testing_session.run(tf.get_collection('accuracy')[0], feed_dict={'X:0': X_test, 'y:0': y_test})
+    print('Test accuracy: {}'.format(test_accuracy))

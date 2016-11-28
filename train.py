@@ -50,7 +50,7 @@ with tf.Session() as training_session:
     training_session.run(init)
 
     # Training parameters
-    NUM_TRAINING_REPETITIONS = 30
+    NUM_TRAINING_REPETITIONS = 25
     BATCH_SIZE = 1500
 
     # Run the computation graph on the training data, passing it in in batches, and repeating the whole thing NUM_TRAINING_REPETITIONS times

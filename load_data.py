@@ -12,7 +12,7 @@ def load_dummy_data():
     from random_seed import RANDOM_SEED
     random.seed(RANDOM_SEED)
 
-    NUM_CLASSES = 16
+    NUM_CLASSES = 15
     total_observations = 2**(NUM_CLASSES-1)
 
     import numpy as np

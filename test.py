@@ -1,8 +1,8 @@
 import tensorflow as tf
 
 with tf.Session() as testing_session:
-    from save_location import SAVE_LOCATION
-    new_saver = tf.train.import_meta_graph(SAVE_LOCATION + '.meta')
+    from save_location import SAVE_LOCATION, meta
+    new_saver = tf.train.import_meta_graph(meta(SAVE_LOCATION))
     new_saver.restore(testing_session, SAVE_LOCATION)
 
     from load_data import X_test, y_test

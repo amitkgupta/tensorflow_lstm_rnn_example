@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from load_data import X_train, y_train
+from tf_expression_name_coordination import X_PLACEHOLDER_NAME, Y_PLACEHOLDER_NAME, ACCURACY_OPERATION_NAME, feed_dict_key
 
 # Dimensions
 num_classes = len(y_train[0])
@@ -21,8 +22,8 @@ hidden_biases = tf.Variable(tf.random_normal([NUM_HIDDEN]))
 output_biases = tf.Variable(tf.random_normal([num_classes]))
 
 # Input placeholders for the computations when the graph gets run
-X = tf.placeholder(tf.float32, [None, num_timesteps, num_features], name='X')
-y = tf.placeholder(tf.float32, [None, num_classes], name='y')
+X = tf.placeholder(tf.float32, [None, num_timesteps, num_features], name=X_PLACEHOLDER_NAME)
+y = tf.placeholder(tf.float32, [None, num_classes], name=Y_PLACEHOLDER_NAME)
 
 # Express predicted y values for input X using single LSTM cell RNN
 _outputs, _ = tf.nn.rnn(
@@ -32,14 +33,16 @@ _outputs, _ = tf.nn.rnn(
 )
 predictions = tf.matmul(_outputs[-1], output_weights) + output_biases
 
-# Express loss of the model in terms of predictions and input y values, and implicitly express updating trainable variables by minimizing loss
+# Express loss of the model in terms of predictions and input y values,
+#   and implicitly express updating trainable variables by minimizing loss
 _loss          = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(predictions, y)) \
                  + LAMBDA_LOSS_AMOUNT * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables())
 minimized_loss = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(_loss)
 
-# Express accuracy in terms of predictions and input y values, and remember expression by name, so it can be used during testing
-accuracy      = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(predictions, 1), tf.argmax(y, 1)), dtype=tf.float32), name='accuracy')
-tf.add_to_collection('accuracy', accuracy)
+# Express accuracy in terms of predictions and input y values,
+#   and add expression to named collection, so it can be used during testing
+accuracy      = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(predictions, 1), tf.argmax(y, 1)), dtype=tf.float32))
+tf.add_to_collection(ACCURACY_OPERATION_NAME, accuracy)
 
 # Setup to save trained model parameters
 saver = tf.train.Saver()
@@ -53,10 +56,17 @@ with tf.Session() as training_session:
     NUM_TRAINING_REPETITIONS = 25
     BATCH_SIZE = 1500
 
-    # Run the computation graph on the training data, passing it in in batches, and repeating the whole thing NUM_TRAINING_REPETITIONS times
+    # Run the computation graph on the training data, passing it in in batches,
+    #   and repeating the whole thing NUM_TRAINING_REPETITIONS times
     for _ in range(NUM_TRAINING_REPETITIONS):
         for start, end in zip(range(0, len(X_train), BATCH_SIZE), range(BATCH_SIZE, len(X_train) + 1, BATCH_SIZE)):
-            training_session.run(minimized_loss, feed_dict={'X:0': X_train[start:end], 'y:0': y_train[start:end]})
+            training_session.run(
+                minimized_loss,
+                feed_dict={
+                    feed_dict_key(X_PLACEHOLDER_NAME): X_train[start:end],
+                    feed_dict_key(Y_PLACEHOLDER_NAME): y_train[start:end],
+                },
+            )
 
     # Save
     from save_location import SAVE_LOCATION

@@ -25,11 +25,11 @@ predicted classes of the training data according to the intermediate RNN model. 
 feeds the data to the training process multiple times (for a more accurate model) in batches
 (for efficiency).
 
-`test.py` loads testing data from `load_data.py`, and restors the Tensorflow computation graph
+`test.py` loads testing data from `load_data.py`, and restores the Tensorflow computation graph
 from the paths determined by `save_location.py`.  It then tests the accuracy of the trained
 model against the test data.
 
-Currently, the test data is dummy generated data, which is then randomly (but deterministically)
+Currently, the loaded data is generated data, which is then randomly (but deterministically)
 shuffled. You can change the `NUM_CLASSES` in `load_data.py` but by default it is `16`.  Each 
 "observation" corresponds to a number in `range(2**(NUM_CLASSES-1))`.  The "class" associated 
 to a number is the number of "1"s appearing in its `NUM_CLASSES-1` digit binary expansion. 

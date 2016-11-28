@@ -12,15 +12,14 @@ def load_dummy_data():
     from random_seed import RANDOM_SEED
     random.seed(RANDOM_SEED)
 
-    NUM_CLASSES = 15
-    total_observations = 2**(NUM_CLASSES-1)
+    NUM_DIGITS = 14
 
     import numpy as np
 
-    observations = np.array([map(lambda ch: [int(ch)], '{0:b}'.format(n).zfill(NUM_CLASSES-1)) for n in range(total_observations)])
+    observations = np.array([map(lambda ch: [int(ch)], '{0:b}'.format(n).zfill(NUM_DIGITS)) for n in range(2**NUM_DIGITS)])
     shuffle(observations)
 
-    one_hots = np.zeros((len(observations), NUM_CLASSES), dtype=np.int32)
+    one_hots = np.zeros((len(observations), NUM_DIGITS+1), dtype=np.int32)
     for idx, obs in enumerate(observations):
         one_hots[idx][sum(observations[idx])] = 1
 

@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 from load_data import X_train, y_train
-from tf_expression_name_coordination import X_PLACEHOLDER_NAME, Y_PLACEHOLDER_NAME, ACCURACY_OPERATION_NAME, feed_dict_key
+from tf_expression_name_coordination import X_PLACEHOLDER_NAME, Y_PLACEHOLDER_NAME, ACCURACY_OPERATION_NAME, PREDICTIONS_OPERATION_NAME, feed_dict_key
 
 # Dimensions
 num_classes = len(y_train[0])
@@ -31,17 +31,19 @@ _outputs, _ = tf.nn.rnn(
     tf.split(0, num_timesteps, tf.matmul(tf.reshape(tf.transpose(X, [1,0,2]), [-1, num_features]), hidden_weights) + hidden_biases),
     dtype=tf.float32,
 )
-predictions = tf.matmul(_outputs[-1], output_weights) + output_biases
+scores = tf.add(tf.matmul(_outputs[-1], output_weights), output_biases)
 
-# Express loss of the model in terms of predictions and input y values,
+# Express loss of the model in terms of scores and input y values,
 #   and implicitly express updating trainable variables by minimizing loss
-_loss          = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(predictions, y)) \
+_loss          = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(scores, y)) \
                  + LAMBDA_LOSS_AMOUNT * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables())
 minimized_loss = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(_loss)
 
-# Express accuracy in terms of predictions and input y values,
-#   and add expression to named collection, so it can be used during testing
-accuracy      = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(predictions, 1), tf.argmax(y, 1)), dtype=tf.float32))
+# Express predictions and accuracy in terms of scores and input y values,
+#   and add expressions to named collections, so they can be used during testing and prediction
+predictions   = tf.argmax(scores, 1)
+accuracy      = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(scores, 1), tf.argmax(y, 1)), dtype=tf.float32))
+tf.add_to_collection(PREDICTIONS_OPERATION_NAME, predictions)
 tf.add_to_collection(ACCURACY_OPERATION_NAME, accuracy)
 
 # Setup to save trained model parameters

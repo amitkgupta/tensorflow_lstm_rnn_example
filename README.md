@@ -37,3 +37,13 @@ RNN's are often used for cases where an observation of features occurs over time
 case, the points in "time" for a given observation correspond to the individual digits in its 
 binary expansion.  And the "feature vector" associated with a given observation at a given 
 digit/"point-in-time" is just the single {0,1}-valued feature of whether that digit is 0 or 1.
+
+## Why is it?
+
+1. It's a complete working example of Tensorflow's RNN capabilities but only takes seconds to
+  run, so you can start tweaking it without having to wait minutes or hours to figure out if you
+  have basic dependencies installed correctly or other things wired up correctly.
+2. It shows how loading data, training, and testing/predicting can be decoupled. `train.py`
+  only depends on the resulting `X_train` and `y_train` from `load_data.py`, and doesn't
+  depend on the process for how the data was loaded. `test.py` only depends on `X_test` and
+  `y_test`. Most importantly, however, is that `test.py` doesn't depend on `train.py` at all.
